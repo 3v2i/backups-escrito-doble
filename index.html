@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Releases del Proyecto</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 1em; }
+    h1 { text-align: center; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 1em; }
+    a { text-decoration: none; color: #0366d6; }
+  </style>
+</head>
+<body>
+  <h1>Releases del Proyecto</h1>
+  <ul id="releases-list">Cargando releases...</ul>
+
+  <script>
+    const owner = '3v2i';
+    const repo = 'backups-escrito-doble';
+
+    async function fetchReleases() {
+      const url = `https://api.github.com/repos/${owner}/${repo}/releases`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        document.getElementById('releases-list').textContent = 'Error al cargar releases.';
+        return;
+      }
+      const releases = await response.json();
+      const ul = document.getElementById('releases-list');
+      ul.innerHTML = '';
+      releases.forEach(release => {
+        const li = document.createElement('li');
+        const title = release.name || release.tag_name;
+        const date = new Date(release.published_at).toLocaleString();
+        let assetsLinks = '';
+        release.assets.forEach(asset => {
+          assetsLinks += `<a href="${asset.browser_download_url}" target="_blank">${asset.name}</a> `;
+        });
+        li.innerHTML = `<strong>${title}</strong> - ${date}<br/>${assetsLinks}`;
+        ul.appendChild(li);
+      });
+    }
+
+    fetchReleases();
+  </script>
+</body>
+</html>
